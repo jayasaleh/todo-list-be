@@ -19,7 +19,7 @@ func NewCategoryHandler() *CategoryHandler {
 	}
 }
 
-// Get Categories - GET /api/categories
+// Get Categories
 func (h *CategoryHandler) GetCategories(c *gin.Context) {
 	categories, err := h.categoryService.GetAllCategories()
 	if err != nil {
@@ -35,7 +35,7 @@ func (h *CategoryHandler) GetCategories(c *gin.Context) {
 	utils.OK(c, "Successfully fetching categories", categoryResponses)
 }
 
-// Get Category by ID - GET /api/categories/:id
+// Get Category by ID
 func (h *CategoryHandler) GetCategory(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
@@ -56,7 +56,7 @@ func (h *CategoryHandler) GetCategory(c *gin.Context) {
 	utils.OK(c, "Successfully fetching category", models.ToCategoryResponse(*category))
 }
 
-// Create Category - POST /api/categories
+// Create Category
 func (h *CategoryHandler) CreateCategory(c *gin.Context) {
 	var req models.CreateCategoryRequest
 
@@ -74,7 +74,7 @@ func (h *CategoryHandler) CreateCategory(c *gin.Context) {
 	utils.Created(c, "Category created successfully", models.ToCategoryResponse(*category))
 }
 
-// Update Category - PUT /api/categories/:id
+// Update Category
 func (h *CategoryHandler) UpdateCategory(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
@@ -102,7 +102,7 @@ func (h *CategoryHandler) UpdateCategory(c *gin.Context) {
 	utils.OK(c, "Category updated successfully", models.ToCategoryResponse(*category))
 }
 
-// Delete Category - DELETE /api/categories/:id
+// Delete Category
 func (h *CategoryHandler) DeleteCategory(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {

@@ -6,31 +6,31 @@ import "time"
 type CreateTodoRequest struct {
 	Title       string     `json:"title" binding:"required"`
 	Description string     `json:"description"`
-	CategoryID  *uint      `json:"category_id"`
-	Priority    Priority   `json:"priority"`
+	CategoryID  uint       `json:"category_id" binding:"required"`
+	Priority    Priority   `json:"priority" binding:"required"`
 	DueDate     *time.Time `json:"due_date"`
 }
 
 type UpdateTodoRequest struct {
-	Title       *string     `json:"title"`
-	Description *string     `json:"description"`
-	CategoryID  *uint       `json:"category_id"`
-	Priority    *Priority   `json:"priority"`
-	Completed   *bool       `json:"completed"`
-	DueDate     *time.Time  `json:"due_date"`
+	Title       *string    `json:"title"`
+	Description *string    `json:"description"`
+	CategoryID  *uint      `json:"category_id"`
+	Priority    *Priority  `json:"priority"`
+	Completed   *bool      `json:"completed"`
+	DueDate     *time.Time `json:"due_date"`
 }
 
 type TodoResponse struct {
-	ID          uint                 `json:"id"`
-	Title       string               `json:"title"`
-	Description string               `json:"description"`
-	Completed   bool                 `json:"completed"`
-	Category    *CategoryResponse    `json:"category,omitempty"`
-	CategoryID  *uint                `json:"category_id,omitempty"`
-	Priority    Priority             `json:"priority"`
-	DueDate     *time.Time           `json:"due_date"`
-	CreatedAt   time.Time            `json:"created_at"`
-	UpdatedAt   time.Time            `json:"updated_at"`
+	ID          uint              `json:"id"`
+	Title       string            `json:"title"`
+	Description string            `json:"description"`
+	Completed   bool              `json:"completed"`
+	Category    *CategoryResponse `json:"category,omitempty"`
+	CategoryID  *uint             `json:"category_id,omitempty"`
+	Priority    Priority          `json:"priority"`
+	DueDate     *time.Time        `json:"due_date"`
+	CreatedAt   time.Time         `json:"created_at"`
+	UpdatedAt   time.Time         `json:"updated_at"`
 }
 
 type CategoryResponse struct {
@@ -107,4 +107,3 @@ func ToCategoryResponse(category Category) CategoryResponse {
 		CreatedAt: category.CreatedAt,
 	}
 }
-

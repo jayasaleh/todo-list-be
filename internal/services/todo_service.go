@@ -25,36 +25,33 @@ func (s *TodoService) CreateTodo(req models.CreateTodoRequest) (*models.Todo, er
 	todo := models.Todo{
 		Title:       req.Title,
 		Description: req.Description,
-		CategoryID:  req.CategoryID,
 		Priority:    req.Priority,
 		DueDate:     req.DueDate,
 	}
 
-	if req.Priority != "" && !models.ValidatePriority(req.Priority) {
+	// Validate category exists
+	var category models.Category
+	if err := s.db.First(&category, req.CategoryID).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errors.New("category not found")
+		}
+		return nil, fmt.Errorf("failed to validate category: %w", err)
+	}
+	categoryID := req.CategoryID
+	todo.CategoryID = &categoryID
+
+	// Validate priority (required)
+	if !models.ValidatePriority(req.Priority) {
 		return nil, errors.New("invalid priority value. Must be 'high', 'medium', or 'low'")
 	}
-
-	if req.Priority == "" {
-		todo.Priority = models.PriorityMedium
-	}
-
-	if req.CategoryID != nil {
-		var category models.Category
-		if err := s.db.First(&category, *req.CategoryID).Error; err != nil {
-			if errors.Is(err, gorm.ErrRecordNotFound) {
-				return nil, errors.New("category not found")
-			}
-			return nil, fmt.Errorf("failed to validate category: %w", err)
-		}
-	}
+	todo.Priority = req.Priority
 
 	if err := s.db.Create(&todo).Error; err != nil {
 		return nil, fmt.Errorf("failed to create todo: %w", err)
 	}
 
-	if todo.CategoryID != nil {
-		s.db.Preload("Category").First(&todo, todo.ID)
-	}
+	// Preload category since category_id is required
+	s.db.Preload("Category").First(&todo, todo.ID)
 
 	return &todo, nil
 }

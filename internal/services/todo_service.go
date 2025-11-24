@@ -29,7 +29,7 @@ func (s *TodoService) CreateTodo(req models.CreateTodoRequest) (*models.Todo, er
 		DueDate:     req.DueDate,
 	}
 
-	// Validate category exists
+	// Validate category exists (required)
 	var category models.Category
 	if err := s.db.First(&category, req.CategoryID).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -37,8 +37,7 @@ func (s *TodoService) CreateTodo(req models.CreateTodoRequest) (*models.Todo, er
 		}
 		return nil, fmt.Errorf("failed to validate category: %w", err)
 	}
-	categoryID := req.CategoryID
-	todo.CategoryID = &categoryID
+	todo.CategoryID = req.CategoryID
 
 	// Validate priority (required)
 	if !models.ValidatePriority(req.Priority) {
@@ -50,7 +49,7 @@ func (s *TodoService) CreateTodo(req models.CreateTodoRequest) (*models.Todo, er
 		return nil, fmt.Errorf("failed to create todo: %w", err)
 	}
 
-	// Preload category since category_id is required
+	// Preload category (required field)
 	s.db.Preload("Category").First(&todo, todo.ID)
 
 	return &todo, nil
@@ -156,6 +155,7 @@ func (s *TodoService) UpdateTodo(id uint, req models.UpdateTodoRequest) (*models
 		todo.Completed = *req.Completed
 	}
 	if req.CategoryID != nil {
+		// Validate category exists (required if provided)
 		var category models.Category
 		if err := s.db.First(&category, *req.CategoryID).Error; err != nil {
 			if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -163,7 +163,7 @@ func (s *TodoService) UpdateTodo(id uint, req models.UpdateTodoRequest) (*models
 			}
 			return nil, fmt.Errorf("failed to validate category: %w", err)
 		}
-		todo.CategoryID = req.CategoryID
+		todo.CategoryID = *req.CategoryID
 	}
 	if req.Priority != nil {
 		if !models.ValidatePriority(*req.Priority) {
@@ -179,9 +179,8 @@ func (s *TodoService) UpdateTodo(id uint, req models.UpdateTodoRequest) (*models
 		return nil, fmt.Errorf("failed to update todo: %w", err)
 	}
 
-	if todo.CategoryID != nil {
-		s.db.Preload("Category").First(&todo, todo.ID)
-	}
+	// Preload category (required field)
+	s.db.Preload("Category").First(&todo, todo.ID)
 
 	return &todo, nil
 }

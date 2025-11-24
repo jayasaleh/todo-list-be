@@ -14,7 +14,7 @@ type CreateTodoRequest struct {
 type UpdateTodoRequest struct {
 	Title       *string    `json:"title"`
 	Description *string    `json:"description"`
-	CategoryID  *uint      `json:"category_id"`
+	CategoryID *uint      `json:"category_id" binding:"omitempty,required"`
 	Priority    *Priority  `json:"priority"`
 	Completed   *bool      `json:"completed"`
 	DueDate     *time.Time `json:"due_date"`
@@ -26,7 +26,7 @@ type TodoResponse struct {
 	Description string            `json:"description"`
 	Completed   bool              `json:"completed"`
 	Category    *CategoryResponse `json:"category,omitempty"`
-	CategoryID  *uint             `json:"category_id,omitempty"`
+	CategoryID  uint              `json:"category_id"`
 	Priority    Priority          `json:"priority"`
 	DueDate     *time.Time        `json:"due_date"`
 	CreatedAt   time.Time         `json:"created_at"`

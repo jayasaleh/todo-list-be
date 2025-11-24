@@ -19,7 +19,7 @@ type Todo struct {
 	Title       string         `json:"title" gorm:"not null"`
 	Description string         `json:"description"`
 	Completed   bool           `json:"completed" gorm:"default:false"`
-	CategoryID  *uint          `json:"category_id"`
+	CategoryID  uint           `json:"category_id" gorm:"not null"`
 	Priority    Priority       `json:"priority" gorm:"default:'medium'"`
 	DueDate     *time.Time     `json:"due_date"`
 	CreatedAt   time.Time      `json:"created_at"`

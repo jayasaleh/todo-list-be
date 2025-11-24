@@ -1,0 +1,53 @@
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: todolist_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: todolist_db
+    # Port tidak perlu di-expose karena backend di container bisa akses langsung via internal network
+    # Jika perlu akses dari host untuk debugging, uncomment line berikut:
+    # ports:
+    #   - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - todolist_network
+
+  # Backend API
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: todolist_backend
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: todolist_db
+      DB_SSLMODE: disable
+      PORT: 8080
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - todolist_network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  todolist_network:
+    driver: bridge
+
